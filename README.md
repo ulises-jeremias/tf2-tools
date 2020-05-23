@@ -66,7 +66,7 @@ to access the running container's shell.
 
 ## Datasets
 
-We used `Cifar10`, `Cifar100` and `MNist` to create the examples.
+We used `Cifar10`, `Cifar100` and `MNIST` to create the examples.
 
 ## Models & Techniques
 
