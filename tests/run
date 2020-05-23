@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+ROOT=$(dirname $0)
+
+T=5
+
+tests=(
+    "$ROOT/densenet/execute $ROOT/densenet/normal/config_mnist.conf --times $T -o $ROOT/results/results"
+    "$ROOT/densenet/execute $ROOT/densenet/normal/config_cifar10.conf --times $T -o $ROOT/results/results"
+    "$ROOT/densenet/execute $ROOT/densenet/normal/config_cifar100.conf  --times $T -o $ROOT/results/results"
+
+    "$ROOT/densenet/execute $ROOT/densenet/maml/config_mnist.conf --engine maml --times $T -o $ROOT/results/results"
+    "$ROOT/densenet/execute $ROOT/densenet/maml/config_cifar10.conf --engine maml --times $T -o $ROOT/results/results"
+    "$ROOT/densenet/execute $ROOT/densenet/maml/config_cifar100.conf --engine maml --times $T -o $ROOT/results/results"
+)
+
+. $ROOT/runner.sh
