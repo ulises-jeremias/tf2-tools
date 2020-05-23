@@ -1,6 +1,6 @@
-# tf2-tools
+# TensorFlow Tools
 
-Scripts and utilities for training and testing models, datasets splitting and more! All written in tf2
+Scripts and utilities for training and testing models, datasets splitting and more! All written in TensorFlow v2.
 
 ## Content
 
