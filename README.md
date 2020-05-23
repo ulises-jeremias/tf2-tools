@@ -154,7 +154,7 @@ where
 
 ```
 <dataset> = cifar10 | cifar100 | mnist
-<model> = densenet | protonet | VGG16 | VGG19 | Inception_v3 | DenseNet | DenseNet169 | DenseNet201
+<model> = vgg16 | vgg19 | inception_v3 | densenet | densenet169 | densenet201
 ```
 
 To run TensorBoard, use the following command:
