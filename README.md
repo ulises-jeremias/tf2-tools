@@ -70,7 +70,7 @@ We used `Cifar10`, `Cifar100` and `MNIST` to create the examples.
 
 ### Dense Net
 
-We implemented Densenet using squeeze and excitation layers in tensorflow 2 for our experiments. To see its implementation go to [densenet](https://github.com/okason97/DenseNet-Tensorflow2).
+We implemented Densenet using squeeze and excitation layers in tensorflow 2 for our example. To see its implementation go to [densenet](https://github.com/okason97/DenseNet-Tensorflow2).
 
 For more information about densenet please refer to the [original paper](https://arxiv.org/abs/1608.06993).
 
@@ -98,6 +98,9 @@ $ ./bin/run --model densenet --mode eval --config <config>
 </details>
 
 ### Transfer Learning
+
+In this example we can see an implementation of Transfer Learning Technique using the following models
+as base: `VGG16`, `VGG19`, `Inception_v3`, `DenseNet`, `DenseNet169`, `DenseNet201`.
 
 <details><summary>Training and Eval</summary>
 
