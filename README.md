@@ -22,7 +22,7 @@ Scripts and utilities for training and testing models, datasets splitting and mo
 
 # Real World Examples
 
-In the `/examples` dir there are a lot of real world applications of `tf-tools`. The following subsections explain how to run the examples and observe the results.
+In the `examples/` dir there are a lot of real world applications of `tf-tools`. The following subsections explain how to run the examples and observe the results.
 
 ## Quickstart
 
