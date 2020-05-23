@@ -132,7 +132,7 @@ $ ./bin/run --tl --model <model> --mode eval --config <config>
 
 ## Results
 
-In the `/results` directory you can find the results of a training processes using a `<model>` on a specific `<dataset>`:
+In the `results/` directory you can find the results of a training processes using a `<model>` on a specific `<dataset>`:
 
 ```
 .
