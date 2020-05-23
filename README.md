@@ -9,7 +9,7 @@ Scripts and utilities for training and testing of models written in tensorflow v
     - [Quickstart](#quickstart)
     - [Datasets](#datasets)
     - [Models and Techniques](#models-&-techniques)
-        - [Dense Net](#densenet)
+        - [Dense Net](#dense-net)
         - [Transfer Learning](#transfer-learning)
     - [Results](#results)
 - [Contributors](#contributors)
@@ -50,12 +50,10 @@ version	Specify the version of the TensorFlow binary image, for example: 2.1.0
 You can use multiple variants at once. For example, the following downloads TensorFlow release images to your machine. For example:
 
 ```sh
-$ ./bin/start -n myContainer --build  # latest stable release
-$ ./bin/start -n myContainer --build -t devel-gpu # nightly dev release w/ GPU support
-$ ./bin/start -n myContainer --build -t latest-gpu-jupyter # latest release w/ GPU support and Jupyter
+$ ./bin/start -n my-container --build  # latest stable release
+$ ./bin/start -n my-container --build -t devel-gpu # nightly dev release w/ GPU support
+$ ./bin/start -n my-container --build -t latest-gpu-jupyter # latest release w/ GPU support and Jupyter
 ```
-
-Once the docker container is running it will execute the contents of the /bin/execute file.
 
 You can execute
 
