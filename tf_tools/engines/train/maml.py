@@ -66,12 +66,11 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True,
         meta_model_weights = model.get_weights()
 
         # train on the task (one epoch)
-        task_batches = 0
+        batches = 0
         for images, labels in train_gen:
-            batches += 1
             train_step(images, labels)
-            task_batches += 1
-            if task_batches >= train_size / batch_size:
+            batches += 1
+            if batches >= train_size / batch_size:
                 # we need to break the loop by hand because
                 # the generator loops indefinitely
                 break
