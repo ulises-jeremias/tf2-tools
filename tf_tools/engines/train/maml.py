@@ -69,7 +69,7 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True,
             batches += 1
             train_step(images, labels)
             task_batches += 1
-            if task_batches >= task_train_size:
+            if task_batches >= train_size / batch_size:
                 # we need to break the loop by hand because
                 # the generator loops indefinitely
                 break
