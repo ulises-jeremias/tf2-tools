@@ -78,8 +78,11 @@ def train(*args, log_info=None, **kwargs):
 
     print("Starting training")
 
-    loss, acc = train_engine(*args, **kwargs, train_summary_writer=train_summary_writer,
-                             val_summary_writer=val_summary_writer, csv_output_file=csv_output_path)
+    kwargs['train_summary_writer'] = train_summary_writer,
+    kwargs['val_summary_writer'] = val_summary_writer
+    kwargs['csv_output_file'] = csv_output_path
+
+    loss, acc = train_engine(*args, **kwargs)
 
     time_end = time.time()
 
