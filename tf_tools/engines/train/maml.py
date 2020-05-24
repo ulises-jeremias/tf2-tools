@@ -10,7 +10,7 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True,
           checkpoint_path=None, max_patience=25, nb_classes=None,
           train_summary_writer=None, val_summary_writer=None, csv_output_file=None,
           optimizer=None, meta_optimizer=None, loss_object=None, lr=0.001,
-          task_train_size=1, meta_train_size=1, train_epochs=5, **kwargs):
+          task_train_size=1, meta_train_size=1, train_epochs=3, **kwargs):
 
     min_loss = 100
     min_loss_acc = 0
