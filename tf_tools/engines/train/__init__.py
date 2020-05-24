@@ -71,7 +71,7 @@ def train(*args, log_info=None, **kwargs):
     kwargs['csv_output_file'] = csv_output_path
     kwargs['checkpoint_path'] = checkpoint_path
 
-    tf.keras.utils.plot_model(model, "{}/model.png".format(results_dir), show_shapes=True)
+    tf.keras.utils.plot_model(kwargs["model"], "{}/model.png".format(results_dir), show_shapes=True)
         
     (train_step, meta_step, test_step) = steps(*args, **kwargs)
 
