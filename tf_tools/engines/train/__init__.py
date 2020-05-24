@@ -85,8 +85,6 @@ def train(*args, log_info=None, **kwargs):
 
     loss, acc = train_engine(*args, **kwargs)
 
-    time_end = time.time()
-
     summary = "{}, {}, {}, {}, {}, {}\n".format(
         now_as_str, log_info['data.dataset'], log_info['model.name'], config_path, loss, acc)
     print(summary)
