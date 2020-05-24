@@ -3,18 +3,29 @@ import numpy as np
 import tensorflow as tf
 
 
-def train(model=None, epochs=10, batch_size=32, format_paths=True,
-          train_gen=None, train_size=None, val_gen=None, val_size=None,
+def train(model=None, epochs=10, batch_size=32, format_paths=True, x_train=None, y_train=None,
+          train_gen=None, train_size=None, val_gen=None, val_size=None, train_datagen=None,
           train_loss=None, train_accuracy=None, test_loss=None, test_accuracy=None,
           val_loss=None, val_accuracy=None, train_step=None, test_step=None, meta_step=None,
           checkpoint_path=None, max_patience=25, nb_classes=None,
           train_summary_writer=None, val_summary_writer=None, csv_output_file=None,
           optimizer=None, meta_optimizer=None, loss_object=None, lr=0.001,
-          task_train_size=1, meta_train_size=1, train_epochs=3, **kwargs):
+          train_epochs=3, n_tasks=1, **kwargs):
 
     min_loss = 100
     min_loss_acc = 0
     patience = 0
+
+    # shuffle the meta train images maintaining the same label order
+    index_sets = [np.argwhere(i == y_train) for i in np.unique(y_train)]
+    x_meta_train = np.copy(x_train)
+    for class_indexes in index_sets:
+        shuffled_class_indexes = np.copy(class_indexes)
+        np.random.shuffle(shuffled_class_indexes)
+        for i in range(len(class_indexes)):
+            x_meta_train[class_indexes[i]] = x_train[shuffled_class_indexes[i]]
+
+    meta_train_gen = train_datagen.flow(x_meta_train, y_train, batch_size=batch_size, seed=42)
 
     results = 'epoch,loss,accuracy,val_loss,val_accuracy\n'
 
@@ -23,44 +34,35 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True,
 
     for epoch in range(epochs):
 
-        for _ in range(train_epochs):
+        for train_epoch in range(train_epochs):
 
             batches = 0
-            while not ((batches + task_train_size + meta_train_size) >= train_size / batch_size):
+            while batches < train_size / batch_size:
+
+                batches += n_tasks
+
                 # get the weights of the initial model that will do the meta learning
                 meta_model_weights = model.get_weights()
 
-                # train on the task (one epoch)
-                task_batches = 0
-                for images, labels in train_gen:
-                    batches += 1
-                    train_step(images, labels)
-                    task_batches += 1
-                    if task_batches >= task_train_size:
-                        # we need to break the loop by hand because
-                        # the generator loops indefinitely
-                        break
+                for k in range(n_tasks):
 
-                # test on the validation set the improvement achieved on one task for the meta learning
-                meta_batches = 0
-                sum_gradients = np.zeros_like(model.trainable_variables)
-                for images, labels in train_gen:
-                    batches += 1
+                    # train on the task (one batch)
+                    images, labels = train_gen.next()
+                    train_step(images, labels)
+
+                    # test on the validation set the improvement achieved on one task for the meta learning
+                    sum_gradients = np.zeros_like(model.trainable_variables)
+                    images, labels = meta_train_gen.next()
                     gradients = meta_step(images, labels)
                     gradients = np.array([np.array(x) for x in gradients])
                     sum_gradients = sum_gradients + gradients
-                    meta_batches += 1
-                    if meta_batches >= meta_train_size:
-                        # we need to break the loop by hand because
-                        # the generator loops indefinitely
-                        break
 
-                # set weights of the model to the weights of the original model
-                model.set_weights(meta_model_weights)
+                    # set weights of the model to the weights of the original model
+                    model.set_weights(meta_model_weights)
 
-                # update the weights of the meta learning model using the loss obtained from testing
-                meta_optimizer.apply_gradients(
-                    zip(sum_gradients, model.trainable_variables))
+            # update the weights of the meta learning model using the loss obtained from testing
+            meta_optimizer.apply_gradients(
+                zip(gradients, model.trainable_variables))
 
         # get the weights of the initial model that will do the meta learning
         meta_model_weights = model.get_weights()
