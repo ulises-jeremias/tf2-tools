@@ -67,6 +67,7 @@ def train(*args, log_info=None, **kwargs):
         train_summary_file_path)
     val_summary_writer = tf.summary.create_file_writer(test_summary_file_path)
 
+    # tf.keras.utils.plot_model(model, "{}/model.png".format(results_dir), show_shapes=True)
         
     (train_step, meta_step, test_step) = steps(*args, **kwargs)
 
@@ -81,6 +82,7 @@ def train(*args, log_info=None, **kwargs):
     kwargs['train_summary_writer'] = train_summary_writer,
     kwargs['val_summary_writer'] = val_summary_writer
     kwargs['csv_output_file'] = csv_output_path
+    kwargs['checkpoint_path'] = checkpoint_path
 
     loss, acc = train_engine(*args, **kwargs)
 

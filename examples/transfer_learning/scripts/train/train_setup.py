@@ -30,6 +30,7 @@ def train(config):
     optimizer = tf.keras.optimizers.Adam()
 
     time_start = time.time()
+    
     # Compiles a model, prints the model summary, and saves the model diagram into a png file.
     model = create_model(
         model_name=config['model.name'],
@@ -40,9 +41,6 @@ def train(config):
         loss_object=loss_object,
     )
     # model.summary()
-
-    tf.keras.utils.plot_model(
-        model, "{}/model.png".format(results_dir), show_shapes=True)
 
     train_loss = tf.keras.metrics.Mean(name='train_loss')
     train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
