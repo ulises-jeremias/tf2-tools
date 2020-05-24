@@ -10,7 +10,7 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True,
           checkpoint_path=None, max_patience=25, nb_classes=None,
           train_summary_writer=None, val_summary_writer=None, csv_output_file=None,
           optimizer=None, meta_optimizer=None, loss_object=None, lr=0.001,
-          task_train_size=1, meta_train_size=1, **kwargs):
+          task_train_size=1, meta_train_size=1, train_epochs=5, **kwargs):
 
     min_loss = 100
     min_loss_acc = 0
@@ -23,42 +23,44 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True,
 
     for epoch in range(epochs):
 
-        batches = 0
-        while not ((batches + task_train_size + meta_train_size) >= train_size / batch_size):
-            # get the weights of the initial model that will do the meta learning
-            meta_model_weights = model.get_weights()
+        for _ in range(train_epochs):
 
-            # train on the task (one epoch)
-            task_batches = 0
-            for images, labels in train_gen:
-                batches += 1
-                train_step(images, labels)
-                task_batches += 1
-                if task_batches >= task_train_size:
-                    # we need to break the loop by hand because
-                    # the generator loops indefinitely
-                    break
+            batches = 0
+            while not ((batches + task_train_size + meta_train_size) >= train_size / batch_size):
+                # get the weights of the initial model that will do the meta learning
+                meta_model_weights = model.get_weights()
 
-            # test on the validation set the improvement achieved on one task for the meta learning
-            meta_batches = 0
-            sum_gradients = np.zeros_like(model.trainable_variables)
-            for images, labels in train_gen:
-                batches += 1
-                gradients = meta_step(images, labels)
-                gradients = np.array([np.array(x) for x in gradients])
-                sum_gradients = sum_gradients + gradients
-                meta_batches += 1
-                if meta_batches >= meta_train_size:
-                    # we need to break the loop by hand because
-                    # the generator loops indefinitely
-                    break
+                # train on the task (one epoch)
+                task_batches = 0
+                for images, labels in train_gen:
+                    batches += 1
+                    train_step(images, labels)
+                    task_batches += 1
+                    if task_batches >= task_train_size:
+                        # we need to break the loop by hand because
+                        # the generator loops indefinitely
+                        break
 
-            # set weights of the model to the weights of the original model
-            model.set_weights(meta_model_weights)
+                # test on the validation set the improvement achieved on one task for the meta learning
+                meta_batches = 0
+                sum_gradients = np.zeros_like(model.trainable_variables)
+                for images, labels in train_gen:
+                    batches += 1
+                    gradients = meta_step(images, labels)
+                    gradients = np.array([np.array(x) for x in gradients])
+                    sum_gradients = sum_gradients + gradients
+                    meta_batches += 1
+                    if meta_batches >= meta_train_size:
+                        # we need to break the loop by hand because
+                        # the generator loops indefinitely
+                        break
 
-            # update the weights of the meta learning model using the loss obtained from testing
-            meta_optimizer.apply_gradients(
-                zip(sum_gradients, model.trainable_variables))
+                # set weights of the model to the weights of the original model
+                model.set_weights(meta_model_weights)
+
+                # update the weights of the meta learning model using the loss obtained from testing
+                meta_optimizer.apply_gradients(
+                    zip(sum_gradients, model.trainable_variables))
 
         # get the weights of the initial model that will do the meta learning
         meta_model_weights = model.get_weights()
