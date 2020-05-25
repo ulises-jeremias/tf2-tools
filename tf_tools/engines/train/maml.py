@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import tensorflow as tf
+from tf_tools.utils import save_in_file
 
 
 def train(model=None, epochs=10, batch_size=32, format_paths=True, x_train=None, y_train=None,
@@ -29,8 +30,7 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True, x_train=None,
 
     results = 'epoch,loss,accuracy,val_loss,val_accuracy\n'
 
-    if not meta_optimizer:
-        meta_optimizer = tf.keras.optimizers.Adam()
+    meta_optimizer = meta_optimizer or tf.keras.optimizers.Adam()
 
     for epoch in range(epochs):
 
@@ -61,8 +61,7 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True, x_train=None,
                     model.set_weights(meta_model_weights)
 
             # update the weights of the meta learning model using the loss obtained from testing
-            meta_optimizer.apply_gradients(
-                zip(gradients, model.trainable_variables))
+            meta_optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
         # get the weights of the initial model that will do the meta learning
         meta_model_weights = model.get_weights()
@@ -90,12 +89,13 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True, x_train=None,
         # set weights of the model to the weights of the original model
         model.set_weights(meta_model_weights)
 
-        results += '{},{},{},{},{}\n'.format(
+        results += f"{},{},{},{},{}\n".format(
             epoch,
             train_loss.result(),
             train_accuracy.result()*100,
             val_loss.result(),
             val_accuracy.result()*100)
+
         print('Epoch: {}, Train Loss: {}, Train Acc:{}, Test Loss: {}, Test Acc: {}'.format(
             epoch,
             train_loss.result(),
@@ -103,17 +103,18 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True, x_train=None,
             val_loss.result(),
             val_accuracy.result()*100))
 
-        if (val_loss.result() < min_loss):
+        if val_loss.result() >= min_loss:
+            patience += 1
+        else:
             min_loss = val_loss.result()
             min_loss_acc = val_accuracy.result()
             patience = 0
+
             # serialize weights to HDF5
             if format_paths:
-                checkpoint_path = checkpoint_path.format(
-                    epoch=epoch, val_loss=min_loss, val_accuracy=min_loss_acc)
+                checkpoint_path = checkpoint_path.format(epoch=epoch, val_loss=min_loss, val_accuracy=min_loss_acc)
+
             model.save_weights(checkpoint_path)
-        else:
-            patience += 1
 
         with train_summary_writer.as_default():
             tf.summary.scalar('loss', train_loss.result(), step=epoch)
@@ -130,8 +131,6 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True, x_train=None,
         if patience >= max_patience:
             break
 
-    file = open(csv_output_file, 'w')
-    file.write(results)
-    file.close()
+    save_in_file(result, csv_output_file)
 
     return min_loss, min_loss_acc

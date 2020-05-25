@@ -1,5 +1,6 @@
 import os
 import tensorflow as tf
+from tf_tools.utils import save_in_file
 
 
 def train(model=None, epochs=10, batch_size=32, format_paths=True,
@@ -26,8 +27,8 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True,
                 break
 
         batches = 0
-        for val_images, val_labels in val_gen:
-            test_step(val_images, val_labels)
+        for images, labels in val_gen:
+            test_step(images, labels)
             batches += 1
             if batches >= val_size / batch_size:
                 # we need to break the loop by hand because
@@ -47,17 +48,18 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True,
             val_loss.result(),
             val_accuracy.result()*100))
 
-        if (val_loss.result() < min_loss):
+        if val_loss.result() >= min_loss:
+            patience += 1
+        else:
             min_loss = val_loss.result()
             min_loss_acc = val_accuracy.result()
             patience = 0
+
             # serialize weights to HDF5
             if format_paths:
-                checkpoint_path = checkpoint_path.format(
-                    epoch=epoch, val_loss=min_loss, val_accuracy=min_loss_acc)
+                checkpoint_path = checkpoint_path.format(epoch=epoch, val_loss=min_loss, val_accuracy=min_loss_acc)
+
             model.save_weights(checkpoint_path)
-        else:
-            patience += 1
 
         with train_summary_writer.as_default():
             tf.summary.scalar('loss', train_loss.result(), step=epoch)
@@ -74,8 +76,6 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True,
         if patience >= max_patience:
             break
 
-    file = open(csv_output_file, 'w')
-    file.write(results)
-    file.close()
+    save_in_file(result, csv_output_file)
 
     return min_loss, min_loss_acc

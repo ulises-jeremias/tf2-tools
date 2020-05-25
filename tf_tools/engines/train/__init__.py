@@ -8,7 +8,6 @@ from tf_tools.engines.steps import steps
 from .train import train as normal_train
 from .maml import train as maml_train
 
-
 def train(*args, log_info=None, **kwargs):
     np.random.seed(2020)
     tf.random.set_seed(2020)
@@ -85,8 +84,8 @@ def train(*args, log_info=None, **kwargs):
 
     loss, acc = train_engine(*args, **kwargs)
 
-    summary = "{}, {}, {}, {}, {}, {}\n".format(
-        now_as_str, log_info['data.dataset'], log_info['model.name'], config_path, loss, acc)
+    summary = f"{now_as_str}, {log_info['data.dataset']}, {log_info['model.name']}, {config_path}, {loss}, {acc}\n"
+    
     print(summary)
 
     file = open(summary_path, 'a+')
@@ -94,4 +93,3 @@ def train(*args, log_info=None, **kwargs):
     file.close()
 
     return loss, acc
-
