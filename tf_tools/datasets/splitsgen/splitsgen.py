@@ -14,7 +14,7 @@ def store_split(x, y, path, data_dir, mode='w'):
     f.close()
 
 
-def generate_splits(x, y, split, data_dir, splits_dir, dataset, version, train_size, test_size, n_train_per_class, n_test_per_class, seed, balanced=False):
+def generate_splits(x, y, split, data_dir, splits_dir, dataset, version, train_size, test_size, n_train_per_class, n_test_per_class, seed, balanced=False, **kargs):
     np.random.seed(seed)
 
     data_dir = data_dir if data_dir else '/tf/data/{}/data'.format(dataset)
