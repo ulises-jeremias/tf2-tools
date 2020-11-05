@@ -9,7 +9,7 @@ from tf_tools.model_selection import train_test_split_balanced
 def store_split(x, y, path, data_dir, mode='w'):
     f = open(path, mode)
     for img, label in zip(x, y):
-        img = os.path.relpath(img, data_dir)
+        img = os.path.normpath(os.path.relpath(img, data_dir))
         f.write("{} {}\n".format(img, label))
     f.close()
 
